@@ -1,0 +1,46 @@
+name: "CI"
+
+inputs:
+  php-version:
+    required: false
+    default: "8.1"
+
+  code-style-php-version:
+    required: false
+    default: "8.1"
+
+  composer-dependencies:
+    required: false
+    default: locked
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install composer dependencies
+      uses: ramsey/composer-install@v2
+      with:
+        dependency-versions: ${{ inputs.composer-dependencies }}
+
+    - name: Validate composer.json/lock
+      run: composer validate
+
+    - name: Security audit
+      run: composer audit
+
+    - name: Lint
+      run: composer lint
+
+    - name: Code style
+      if: ${{ inputs.composer-dependencies == 'locked' && inputs.php-version == inputs.code-style-php-version }}
+      run: composer code-style:check
+
+    - name: PHPStan
+      if: ${{ inputs.composer-dependencies == 'locked' }}
+      run: composer phpstan
+
+    - name: Rector
+      if: ${{ inputs.composer-dependencies == 'locked' }}
+      run: composer rector:check
+
+    - name: Tests
+      run: composer tests

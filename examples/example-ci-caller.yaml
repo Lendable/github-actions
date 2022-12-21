@@ -6,23 +6,35 @@ on:
     branches:
       - main
 
-  strategy:
-    matrix:
-      dependencies:
-        - lowest
-        - highest
-        - locked
-      php-version:
-        - "8.0"
-        - "8.1"
-        - "8.2"
-      os:
-        - ubuntu-latest
+
 
 jobs:
   build:
-    uses: Lendable/github-actions/.github/workflows/ci.yaml@main
-    with:
-      composer-dependencies: ${{ matrix.dependencies }}
-      php-version: "${{ matrix.php-version }}"
-      code-style-php-version: "8.1"
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        dependencies:
+          - lowest
+          - highest
+          - locked
+        php-version:
+          - "8.0"
+          - "8.1"
+          - "8.2"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v3"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "xdebug"
+          php-version: "${{ matrix.php-version }}"
+          ini-values: memory_limit=-1
+
+      - uses: Lendable/github-actions/.github/workflows/ci-steps.yaml@main
+        with:
+          composer-dependencies: ${{ matrix.dependencies }}
+          php-version: "${{ matrix.php-version }}"
+          code-style-php-version: "8.1"
