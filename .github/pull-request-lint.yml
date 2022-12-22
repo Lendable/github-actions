@@ -1,0 +1,24 @@
+name: Lint PR Title reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      lint-rules-path:
+        required: true
+        type: string
+
+jobs:
+  pr-lint:
+    runs-on: ["Linux", "self-hosted", "lendable", "X64", "k8s"]
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v3
+
+      - name: Lint PR Title
+        uses: benhodgson87/conventional-pull-request-action@v0.1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commitlintRulesPath: ${{ inputs.lint-rules-path }}
+          ignoreCommits: 'true'
