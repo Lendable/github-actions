@@ -10,6 +10,6 @@ on:
 
 jobs:
   pr-lint:
-    uses: Lendable/github-actions/.github/workflows/pull-request-lint.yml@pr-lint
+    uses: Lendable/github-actions/.github/workflows/pull-request-lint.yml@main
     with:
       lint-rules-path: examples/pr-lint/example-lint-rules.js
